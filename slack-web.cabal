@@ -40,6 +40,7 @@ library
       Web.Slack.Im
       Web.Slack.MessageParser
       Web.Slack.User
+      Web.Slack.Conversation
   other-modules:
       Web.Slack.Types
       Web.Slack.Util

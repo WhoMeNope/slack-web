@@ -31,6 +31,7 @@ module Web.Slack
   , mpimHistory
   , getUserDesc
   , usersList
+  , usersConversations
   , userLookupByEmail
   , authenticateReq
   , Response
@@ -78,6 +79,7 @@ import qualified Web.Slack.Common as Common
 import qualified Web.Slack.Im as Im
 import qualified Web.Slack.Group as Group
 import qualified Web.Slack.User as User
+import qualified Web.Slack.Conversation as Conversation
 
 -- text
 import Data.Text (Text)
@@ -197,6 +199,10 @@ type Api =
     "users.list"
       :> AuthProtect "token"
       :> Post '[JSON] (ResponseJSON User.ListRsp)
+  :<|>
+    "users.conversations"
+      :> AuthProtect "token"
+      :> Post '[JSON] (ResponseJSON Conversation.ListRsp)
   :<|>
     "users.lookupByEmail"
       :> AuthProtect "token"
@@ -333,6 +339,21 @@ groupsList = do
 groupsList_
   :: AuthenticatedRequest (AuthProtect "token")
   -> ClientM (ResponseJSON Group.ListRsp)
+
+-- |
+--
+-- <https://api.slack.com/methods/users.conversations>
+
+usersConversations
+  :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
+  => m (Response Conversation.ListRsp)
+usersConversations = do
+  authR <- mkSlackAuthenticateReq
+  run (usersConversations_ authR)
+
+usersConversations_
+  :: AuthenticatedRequest (AuthProtect "token")
+  -> ClientM (ResponseJSON Conversation.ListRsp)
 
 -- |
 --
@@ -548,6 +569,7 @@ apiTest_
   :<|> mpimList_
   :<|> mpimHistory_
   :<|> usersList_
+  :<|> usersConversations_
   :<|> userLookupByEmail_
   =
   client (Proxy :: Proxy Api)
