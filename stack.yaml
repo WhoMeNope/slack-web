@@ -1,1 +1,6 @@
+nix:
+  enable: true
+  packages:
+  - zlib
+
 resolver: lts-12.16
