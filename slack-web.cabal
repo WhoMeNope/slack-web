@@ -9,20 +9,19 @@ license-file: LICENSE.md
 
 copyright: 2017 Juan Pedro Villa Isaza
 author: Juan Pedro Villa Isaza <jpvillaisaza@gmail.com>
-maintainer: Juan Pedro Villa Isaza <jpvillaisaza@gmail.com>
+maintainer: Martin Toman <whomenope@outlook.com>
 
-homepage: https://github.com/jpvillaisaza/slack-web
-bug-reports: https://github.com/jpvillaisaza/slack-web/issues
+homepage: https://github.com/WhoMeNope/slack-web
+bug-reports: https://github.com/WhoMeNope/slack-web/issues
 
 synopsis: Bindings for the Slack web API
 description: Haskell bindings for the Slack web API.
 
 category: Web
 
-tested-with: GHC == 8.0.2
+tested-with: GHC == 8.4.4
 
 extra-source-files:
-  CHANGELOG.md
   README.md
 
 
@@ -96,4 +95,4 @@ test-suite tests
 
 source-repository head
   type: git
-  location: https://github.com/jpvillaisaza/slack-web
+  location: https://github.com/WhoMeNope/slack-web
