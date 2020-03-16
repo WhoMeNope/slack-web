@@ -1,6 +1,8 @@
 MIT License
 
-Copyright (c) 2017 Juan Pedro Villa Isaza
+Original work Copyright (c) 2017 Juan Pedro Villa Isaza
+
+Modified work Copyright (c) 2020 Martin Toman
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
