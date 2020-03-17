@@ -9,8 +9,6 @@
 -- Module: Web.Slack
 -- Description:
 --
---
---
 ----------------------------------------------------------------------
 
 module Web.Slack
@@ -108,8 +106,8 @@ instance HasToken SlackConfig where
     getToken = slackConfigToken
 
 -- contains errors that can be returned by the slack API.
--- constrast with 'SlackClientError' which additionally
--- contains errors which occured during the network communication.
+-- contrast with 'SlackClientError' which additionally
+-- contains errors which occurred during the network communication.
 data ResponseSlackError = ResponseSlackError Text
   deriving (Eq, Show)
 
@@ -152,6 +150,7 @@ type Api =
   :<|>
     "users.conversations"
       :> AuthProtect "token"
+      :> ReqBody '[FormUrlEncoded] Conversation.ListReq
       :> Post '[JSON] (ResponseJSON Conversation.ListRsp)
   :<|>
     "users.lookupByEmail"
@@ -218,13 +217,15 @@ chatPostMessage_
 
 usersConversations
   :: (MonadReader env m, HasManager env, HasToken env, MonadIO m)
-  => m (Response Conversation.ListRsp)
-usersConversations = do
+  => Conversation.ListReq
+  -> m (Response Conversation.ListRsp)
+usersConversations listReq = do
   authR <- mkSlackAuthenticateReq
-  run (usersConversations_ authR)
+  run (usersConversations_ authR listReq)
 
 usersConversations_
   :: AuthenticatedRequest (AuthProtect "token")
+  -> Conversation.ListReq
   -> ClientM (ResponseJSON Conversation.ListRsp)
 
 -- |
@@ -306,7 +307,7 @@ historyFetchAll
   -- ^ A list merging all the history records that were fetched
   -- through the individual queries.
 historyFetchAll makeReq channel count oldest latest = do
-    -- From slack apidoc: If there are more than 100 messages between
+    -- From slack api-doc: If there are more than 100 messages between
     -- the two timestamps then the messages returned are the ones closest to latest.
     -- In most cases an application will want the most recent messages
     -- and will page backward from there.
