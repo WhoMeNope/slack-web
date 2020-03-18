@@ -19,6 +19,7 @@ module Web.Slack.Conversation
   where
 
 import Data.Aeson.TH
+import Data.Aeson.Types
 import Data.List (intercalate)
 import Data.Text (Text, pack, unpack)
 import GHC.Generics (Generic)
@@ -31,17 +32,17 @@ import Web.Slack.Util
 --
 --
 data ConversationType
-  = PublicChannel
-  | PrivateChannel
-  | Mpim
-  | Im
+  = TypePublicChannel
+  | TypePrivateChannel
+  | TypeMpim
+  | TypeIm
   deriving (Eq, Generic, Show)
 
 instance ToHttpApiData ConversationType where
-  toQueryParam PublicChannel = "public_channel"
-  toQueryParam PrivateChannel = "private_channel"
-  toQueryParam Mpim = "mpim"
-  toQueryParam Im = "im"
+  toQueryParam TypePublicChannel = "public_channel"
+  toQueryParam TypePrivateChannel = "private_channel"
+  toQueryParam TypeMpim = "mpim"
+  toQueryParam TypeIm = "im"
 
 instance ToHttpApiData [ConversationType] where
   toQueryParam types = pack . intercalate "," $
@@ -50,14 +51,73 @@ instance ToHttpApiData [ConversationType] where
 -- |
 --
 --
-data Conversation =
-  Conversation
-    { conversationId :: Text
-    , conversationName :: Text
+data Im =
+  Im
+    { imId :: Text
+    , imUser :: Text
     }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show)
 
-$(deriveFromJSON (jsonOpts "conversation") ''Conversation)
+-- |
+--
+--
+data Mpim =
+  Mpim
+    { mpimId :: Text
+    , mpimName :: Text
+    }
+  deriving (Eq, Show)
+
+-- |
+--
+--
+data Channel =
+  Channel
+    { channelId :: Text
+    , channelName :: Text
+    , channelPrivate :: Bool
+    }
+  deriving (Eq, Show)
+
+-- |
+--
+--
+data Conversation
+  = ConversationChannel Channel
+  | ConversationIm Im
+  | ConversationMpim Mpim
+  deriving (Eq, Show)
+
+instance FromJSON Conversation where
+  parseJSON = withObject "conversation" $ \c -> do
+    conversationType <- conversationTypeFromJSON c
+    return $ case conversationType of
+      TypePublicChannel ->
+        ConversationChannel $ Channel "" "" False
+      TypePrivateChannel ->
+        ConversationChannel $ Channel "" "" True
+      TypeIm ->
+        ConversationIm $ Im "" ""
+      TypeMpim ->
+        ConversationMpim $ Mpim "" ""
+
+conversationTypeFromJSON :: Object -> Parser ConversationType
+conversationTypeFromJSON c = do
+  isIm <- c .: "is_im" :: Parser Bool
+  isMpim <- c .: "is_mpim" :: Parser Bool
+  isChannel <- c .: "is_channel" :: Parser Bool
+  if isIm == True
+    then return TypeIm
+    else if isMpim == True
+      then return TypeMpim
+      else if isChannel == True
+      then do
+        isPrivate <- c .: "is_private" :: Parser Bool
+        case isPrivate of
+          True -> return TypePrivateChannel
+          False -> return TypePublicChannel
+      else do
+        fail "Could not decode conversation type."
 
 -- |
 --
