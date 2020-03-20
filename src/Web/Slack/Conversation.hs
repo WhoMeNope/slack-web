@@ -126,7 +126,6 @@ data Channel =
     , channelCreator :: UserId
     , channelIsPrivate :: Bool
     , channelIsArchived :: Bool
-    , channelIsMember :: Bool
     , channelIsGeneral :: Bool
     , channelLastRead :: Maybe Text
     , channelLatest :: Maybe Text
