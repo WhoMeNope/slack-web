@@ -23,6 +23,7 @@ import Data.Aeson.TH
 import Data.Aeson.Types
 import Data.List (intercalate)
 import Data.Text (Text, pack, unpack)
+import Data.Time.Clock.POSIX (POSIXTime)
 import GHC.Generics (Generic)
 import Web.FormUrlEncoded
 import Web.Internal.HttpApiData
@@ -85,8 +86,12 @@ data Im =
   Im
     { imId :: Text
     , imUser :: Text
+    , imIsOrgShared :: Bool
+    , imIsUserDeleted :: Bool
+    , imCreated :: POSIXTime
+    , imPriority :: Int
     }
-  deriving (Eq, Show)
+  deriving (Eq, Generic, Show)
 
 $(deriveFromJSON (jsonOpts "im") ''Im)
 
@@ -97,6 +102,14 @@ data Mpim =
   Mpim
     { mpimId :: Text
     , mpimName :: Text
+    , mpimCreated :: POSIXTime
+    , mpimCreator :: UserId
+    , mpimIsPrivate :: Bool
+    , mpimIsOpen :: Bool
+    , mpimIsOrgShared :: Bool
+    , mpimPriority :: Int
+    , mpimTopic :: Topic
+    , mpimPurpose :: Purpose
     }
   deriving (Eq, Show)
 
