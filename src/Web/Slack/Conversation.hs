@@ -88,6 +88,8 @@ data Im =
     }
   deriving (Eq, Show)
 
+$(deriveFromJSON (jsonOpts "im") ''Im)
+
 -- |
 --
 --
@@ -97,6 +99,8 @@ data Mpim =
     , mpimName :: Text
     }
   deriving (Eq, Show)
+
+$(deriveFromJSON (jsonOpts "mpim") ''Mpim)
 
 -- |
 --
@@ -135,15 +139,11 @@ data Conversation
 instance FromJSON Conversation where
   parseJSON = withObject "conversation" $ \c -> do
     conversationType <- conversationTypeFromJSON c
-    return $ case conversationType of
-      TypePublicChannel ->
-        ConversationChannel $ Channel "" "" False
-      TypePrivateChannel ->
-        ConversationChannel $ Channel "" "" True
-      TypeIm ->
-        ConversationIm $ Im "" ""
-      TypeMpim ->
-        ConversationMpim $ Mpim "" ""
+    case conversationType of
+      TypePublicChannel  -> ConversationChannel <$> (parseJSON $ Object c)
+      TypePrivateChannel -> ConversationChannel <$> (parseJSON $ Object c)
+      TypeIm   -> ConversationIm   <$> (parseJSON $ Object c)
+      TypeMpim -> ConversationMpim <$> (parseJSON $ Object c)
 
 conversationTypeFromJSON :: Object -> Parser ConversationType
 conversationTypeFromJSON c = do
