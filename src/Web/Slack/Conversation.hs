@@ -27,6 +27,7 @@ import GHC.Generics (Generic)
 import Web.FormUrlEncoded
 import Web.Internal.HttpApiData
 
+import Web.Slack.Common
 import Web.Slack.Util
 
 -- |
@@ -48,6 +49,34 @@ instance ToHttpApiData ConversationType where
 instance ToHttpApiData [ConversationType] where
   toQueryParam types = pack . intercalate "," $
     (unpack . toQueryParam) <$> types
+
+-- |
+--
+--
+
+data Purpose =
+  Purpose
+    { purposeValue :: Text
+    , purposeCreator :: Text
+    , purposeLastSet :: Integer
+    }
+  deriving (Eq, Generic, Show)
+
+$(deriveJSON (jsonOpts "purpose") ''Purpose)
+
+-- |
+--
+--
+
+data Topic =
+  Topic
+    { topicValue :: Text
+    , topicCreator :: Text
+    , topicLastSet :: Integer
+    }
+  deriving (Eq, Generic, Show)
+
+$(deriveJSON (jsonOpts "topic") ''Topic)
 
 -- |
 --
@@ -76,9 +105,23 @@ data Channel =
   Channel
     { channelId :: Text
     , channelName :: Text
-    , channelPrivate :: Bool
+    , channelCreated :: Integer
+    , channelCreator :: UserId
+    , channelIsPrivate :: Bool
+    , channelIsArchived :: Bool
+    , channelIsMember :: Bool
+    , channelIsGeneral :: Bool
+    , channelLastRead :: Maybe Text
+    , channelLatest :: Maybe Text
+    , channelUnreadCount :: Maybe Integer
+    , channelUnreadCountDisplay :: Maybe Integer
+    , channelMembers :: [UserId]
+    , channelTopic :: Topic
+    , channelPurpose :: Purpose
     }
-  deriving (Eq, Show)
+  deriving (Eq, Generic, Show)
+
+$(deriveFromJSON (jsonOpts "channel") ''Channel)
 
 -- |
 --
