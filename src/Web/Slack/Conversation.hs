@@ -106,18 +106,25 @@ conversationTypeFromJSON c = do
   isIm <- c .: "is_im" :: Parser Bool
   isMpim <- c .: "is_mpim" :: Parser Bool
   isChannel <- c .: "is_channel" :: Parser Bool
+  isGroup <- c .: "is_group" :: Parser Bool
+  -- Instant Message
   if isIm == True
-    then return TypeIm
-    else if isMpim == True
-      then return TypeMpim
-      else if isChannel == True
-      then do
-        isPrivate <- c .: "is_private" :: Parser Bool
-        case isPrivate of
-          True -> return TypePrivateChannel
-          False -> return TypePublicChannel
-      else do
-        fail "Could not decode conversation type."
+  then return TypeIm
+  -- Multi Party Instant Message
+  else if isMpim == True
+  then return TypeMpim
+  -- Group -> Private Channel
+  else if isGroup == True
+  then return TypePrivateChannel
+  -- Channel
+  else if isChannel == True
+  then do
+    isPrivate <- c .: "is_private" :: Parser Bool
+    case isPrivate of
+      True -> return TypePrivateChannel
+      False -> return TypePublicChannel
+  else do
+    fail "Could not decode conversation type."
 
 -- |
 --
