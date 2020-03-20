@@ -86,10 +86,8 @@ data Im =
   Im
     { imId :: Text
     , imUser :: Text
-    , imIsOrgShared :: Bool
     , imIsUserDeleted :: Bool
     , imCreated :: POSIXTime
-    , imPriority :: Int
     }
   deriving (Eq, Generic, Show)
 
@@ -105,9 +103,6 @@ data Mpim =
     , mpimCreated :: POSIXTime
     , mpimCreator :: UserId
     , mpimIsPrivate :: Bool
-    , mpimIsOpen :: Bool
-    , mpimIsOrgShared :: Bool
-    , mpimPriority :: Int
     , mpimTopic :: Topic
     , mpimPurpose :: Purpose
     }
