@@ -126,7 +126,6 @@ data Channel =
     , channelLatest :: Maybe Text
     , channelUnreadCount :: Maybe Integer
     , channelUnreadCountDisplay :: Maybe Integer
-    , channelMembers :: [UserId]
     , channelTopic :: Topic
     , channelPurpose :: Purpose
     }
