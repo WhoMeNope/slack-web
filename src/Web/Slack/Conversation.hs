@@ -18,6 +18,7 @@ module Web.Slack.Conversation
   )
   where
 
+import Control.Applicative ((<|>))
 import Data.Aeson.TH
 import Data.Aeson.Types
 import Data.List (intercalate)
@@ -103,10 +104,10 @@ instance FromJSON Conversation where
 
 conversationTypeFromJSON :: Object -> Parser ConversationType
 conversationTypeFromJSON c = do
-  isIm <- c .: "is_im" :: Parser Bool
-  isMpim <- c .: "is_mpim" :: Parser Bool
-  isChannel <- c .: "is_channel" :: Parser Bool
-  isGroup <- c .: "is_group" :: Parser Bool
+  isIm <- (c .: "is_im" :: Parser Bool) <|> (return False)
+  isMpim <- (c .: "is_mpim" :: Parser Bool) <|> (return False)
+  isChannel <- (c .: "is_channel" :: Parser Bool) <|> (return False)
+  isGroup <- (c .: "is_group" :: Parser Bool) <|> (return False)
   -- Instant Message
   if isIm == True
   then return TypeIm
